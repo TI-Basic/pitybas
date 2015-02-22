@@ -24,7 +24,7 @@ def get(f):
 
 class Tracker(type):
     def __new__(self, name, bases, attrs):
-        if not 'token' in attrs:
+        if 'token' not in attrs:
             attrs['token'] = name
 
         attrs.update({
@@ -109,7 +109,8 @@ class Parent:
 
 class Stub:
     @classmethod
-    def add(cls, sub, name, attrs): pass
+    def add(cls, sub, name, attrs):
+        pass
 
 class Token(Parent):
     tokens = {}
@@ -124,7 +125,8 @@ class Token(Parent):
             return repr(self.token)
 
 class StubToken(Token, Stub):
-    def run(self, vm): pass
+    def run(self, vm):
+        pass
 
 class Variable(Parent):
     priority = Pri.NONE
@@ -167,7 +169,8 @@ class Function(Parent):
             return '%s()' % repr(self.token)
 
 class StubFunction(Function, Stub):
-    def call(self, vm, args): pass
+    def call(self, vm, args):
+        pass
 
 # variables
 
@@ -186,15 +189,19 @@ class Const(Variable, Stub):
 class Const(Variable, Stub):
     value = None
 
-    def set(self, vm, value): raise InvalidOperation
-    def get(self, vm): return self.value
+    def set(self, vm, value):
+        raise InvalidOperation
+
+    def get(self, vm):
+        return self.value
 
 class Value(Const, Stub):
     def __init__(self, value):
         self.value = value
         Variable.__init__(self)
 
-    def get(self, vm): return self.value
+    def get(self, vm):
+        return self.value
 
     def __repr__(self):
         return repr(self.value)
@@ -226,7 +233,7 @@ class List(Variable, Stub):
         if self.arg:
             arg = vm.get(self.arg)[0]
             assert isinstance(arg, int)
-            return vm.get_list(self.name)[arg-1]
+            return vm.get_list(self.name)[arg - 1]
 
         return vm.get_list(self.name)
 
@@ -290,7 +297,7 @@ class Matrix(Variable, Stub):
         if self.arg:
             arg = vm.get(self.arg)
             assert isinstance(arg, list) and len(arg) == 2
-            return vm.get_matrix(self.name)[arg[0]-1][arg[1]-1]
+            return vm.get_matrix(self.name)[arg[0] - 1][arg[1] - 1]
 
         return vm.get_matrix(self.name)
 
@@ -301,7 +308,7 @@ class Matrix(Variable, Stub):
             assert isinstance(value, (int, float, complex))
 
             m = vm.get_matrix(self.name)
-            m[arg[0]-1][arg[1]-1] = value
+            m[arg[0] - 1][arg[1] - 1] = value
         else:
             assert isinstance(value, list)
             vm.set_matrix(self.name, value)
@@ -355,7 +362,8 @@ class Fill(Function):
             var.set(vm, m)
 
 class Ans(Const):
-    def get(self, vm): return vm.get_var('Ans')
+    def get(self, vm):
+        return vm.get_var('Ans')
 
 class Pi(Const):
     token = u'π'
@@ -366,8 +374,11 @@ class e(Const):
     value = math.e
 
 class SimpleVar(Variable, Stub):
-    def set(self, vm, value): return vm.set_var(self.token, value)
-    def get(self, vm): return vm.get_var(self.token)
+    def set(self, vm, value):
+        return vm.set_var(self.token, value)
+
+    def get(self, vm):
+        return vm.get_var(self.token)
 
 class NumVar(SimpleVar, Stub):
     def get(self, vm):
@@ -407,7 +418,8 @@ class Stor(Token):
         right.set(vm, ans)
         return ans
 
-class Store(Stor): token = '->'
+class Store(Stor):
+    token = '->'
 
 class Operator(Token, Stub):
     @get
@@ -431,9 +443,12 @@ class FloatOperator(Operator, Stub):
 
         return ans
 
-class AddSub(Operator, Stub): priority = Pri.ADDSUB
-class MultDiv(FloatOperator, Stub): priority = Pri.MULTDIV
-class Exponent(Operator, Stub): priority = Pri.EXPONENT
+class AddSub(Operator, Stub):
+    priority = Pri.ADDSUB
+class MultDiv(FloatOperator, Stub):
+    priority = Pri.MULTDIV
+class Exponent(Operator, Stub):
+    priority = Pri.EXPONENT
 class RightExponent(Exponent, Stub):
     def fill_right(self):
         return Value(None)
@@ -452,7 +467,8 @@ class MathExprFunction(Function, Stub):
         args = vm.get(self.arg)
         return self.call(vm, args[0])
 
-class Logic(Bool): priority = Pri.LOGIC
+class Logic(Bool):
+    priority = Pri.LOGIC
 
 # math
 
@@ -517,7 +533,8 @@ class Sqrt(MathExprFunction):
     def call(self, vm, arg):
         return math.sqrt(arg)
 
-class sqrt(Sqrt): pass
+class sqrt(Sqrt):
+    pass
 
 class CubeRoot(MathExprFunction):
     token = u'³√'
@@ -527,7 +544,7 @@ class CubeRoot(MathExprFunction):
 
         # round to within our accuracy bounds
         # this allows us to reverse a cube properly, as long as we don't pass 14 significant digits
-        i = arg ** (1.0/3)
+        i = arg ** (1.0 / 3)
         places = 14 - len(str(int(math.floor(i))))
         if places > 0:
             return round(i, places)
@@ -617,53 +634,65 @@ class fPart(Function):
 # trig
 
 class sin(MathExprFunction):
-    def call(self, vm, arg): return math.sin(arg)
+    def call(self, vm, arg):
+        return math.sin(arg)
 
 class cos(MathExprFunction):
-    def call(self, vm, arg): return math.cos(arg)
+    def call(self, vm, arg):
+        return math.cos(arg)
 
 class tan(MathExprFunction):
-    def call(self, vm, arg): return math.tan(arg)
+    def call(self, vm, arg):
+        return math.tan(arg)
 
 # TODO: subclass these inverse functions with the unicode -1 token, and probably add support for that in the parser for ints too
 class asin(MathExprFunction):
     token = 'sin-1'
 
-    def call(self, vm, arg): return math.asin(arg)
+    def call(self, vm, arg):
+        return math.asin(arg)
 
 class acos(MathExprFunction):
     token = 'cos-1'
 
-    def call(self, vm, arg): return math.acos(arg)
+    def call(self, vm, arg):
+        return math.acos(arg)
 
 class atan(MathExprFunction):
     token = 'tan-1'
 
-    def call(self, vm, arg): return math.atan(arg)
+    def call(self, vm, arg):
+        return math.atan(arg)
 
 class sinh(MathExprFunction):
-    def call(self, vm, arg): return math.sinh(arg)
+    def call(self, vm, arg):
+        return math.sinh(arg)
 
 class cosh(MathExprFunction):
-    def call(self, vm, arg): return math.cosh(arg)
+    def call(self, vm, arg):
+        return math.cosh(arg)
 
 class tanh(MathExprFunction):
-    def call(self, vm, arg): return math.tanh(arg)
+    def call(self, vm, arg):
+        return math.tanh(arg)
 
 class asinh(MathExprFunction):
     token = 'sin-1'
 
-    def call(self, vm, arg): return math.asinh(arg)
+    def call(self, vm, arg):
+        return math.asinh(arg)
 
 class acosh(MathExprFunction):
     token = 'cos-1'
 
-    def call(self, vm, arg): return math.acosh(arg)
+    def call(self, vm, arg):
+        return math.acosh(arg)
 
 class atanh(MathExprFunction):
     token = 'tan-1'
 
-    def call(self, vm, arg): return math.atanh(arg)
+    def call(self, vm, arg):
+        return math.atanh(arg)
 
 # probability
 
@@ -728,11 +757,11 @@ class randNorm(Function):
 
 class randBin(Function):
     def call(self, vm, args):
-        raise NotImplementedError # numpy.random has a binomial distribution, or I could write my own...
+        raise NotImplementedError  # numpy.random has a binomial distribution, or I could write my own...
 
 class randM(Function):
     def call(self, vm, args):
-        raise NotImplementedError # I don't know how I'm going to do lists and matricies yet
+        raise NotImplementedError  # I don't know how I'm going to do lists and matricies yet
 
 # boolean
 
@@ -868,7 +897,7 @@ class Block(StubToken):
 
 class If(Block):
     def run(self, vm):
-        if self.arg == None:
+        if self.arg is None:
             raise ExecutionError('If statement without condition')
 
         true = bool(vm.get(self.arg))
@@ -894,8 +923,11 @@ class If(Block):
         else:
             vm.inc_row()
 
-    def resume(self, vm, row, col): pass
-    def stop(self, vm, row, col): pass
+    def resume(self, vm, row, col):
+        pass
+
+    def stop(self, vm, row, col):
+        pass
 
 class Then(Token):
     def run(self, vm):
@@ -915,7 +947,7 @@ class Else(Token):
 
 class Loop(Block, Stub):
     def run(self, vm):
-        if self.arg == None:
+        if self.arg is None:
             raise ExecutionError('%s statement without condition' % self.token)
 
         row, col, _ = vm.running[-1]
@@ -1030,6 +1062,7 @@ class Lbl(StubToken):
 
 class Goto(Token):
     absorbs = (Expression, Value)
+
     def run(self, vm):
         Goto.goto(vm, self.arg)
 

@@ -87,7 +87,7 @@ class VT:
 
     def e(self, *seqs):
         for seq in seqs:
-            sys.stdout.write('\033'+seq)
+            sys.stdout.write('\033' + seq)
 
     def clear(self, reset=True):
         self.e('[2J', '[H')
@@ -95,11 +95,11 @@ class VT:
         if reset:
             self.lines = []
             for i in xrange(self.height):
-                self.lines.append([' ']*self.width)
+                self.lines.append([' '] * self.width)
 
     def scroll(self):
         self.lines.pop(0)
-        self.lines.append([' ']*self.width)
+        self.lines.append([' '] * self.width)
         self.row = max(1, self.row - 1)
 
     def flush(self):
@@ -141,7 +141,7 @@ class VT:
                     break
 
             for char in line:
-                self.lines[row-1][col-1] = char
+                self.lines[row - 1][col - 1] = char
                 char = char.encode(sys.stdout.encoding, 'replace')
                 sys.stdout.write(char)
                 col += 1
@@ -253,7 +253,8 @@ class IO:
         self.vt.write(msg)
 
     def pause(self, msg=''):
-        if msg: self.disp(msg)
+        if msg:
+            self.disp(msg)
         self.input('[press enter]', True)
 
     def menu(self, menu):
@@ -277,9 +278,8 @@ class IO:
             self.vt.e('[?25l')
             print
             if choice.isdigit() and 0 < int(choice) <= len(lookup):
-                label = lookup[int(choice)-1]
+                label = lookup[int(choice) - 1]
                 self.vt.flush()
                 return label
             else:
                 print 'invalid choice'
-

@@ -24,7 +24,8 @@ class Interpreter(object):
         return vm
 
     def __init__(self, code, history=10, io=None, name=None):
-        if not io: io = IO
+        if not io:
+            io = IO
         self.io = io(self)
 
         self.name = name
@@ -58,7 +59,7 @@ class Interpreter(object):
         return self.cur()
 
     def inc_row(self):
-        self.line = min(self.line+1, len(self.code)-1)
+        self.line = min(self.line + 1, len(self.code) - 1)
         self.expression = None
         return self.cur()
 
@@ -121,18 +122,20 @@ class Interpreter(object):
 
         for i in xrange(pos, len(self.code)):
             ret = y(i)
-            if ret: yield ret
+            if ret:
+                yield ret
 
         if wrap:
             for i in xrange(0, pos):
                 ret = y(i)
-                if ret: yield ret
+                if ret:
+                    yield ret
 
     def goto(self, row, col):
         if row >= 0 and row < len(self.code)\
-            and col >= 0 and col < len(self.code[row]):
-                self.line = row
-                self.col = col
+           and col >= 0 and col < len(self.code[row]):
+            self.line = row
+            self.col = col
         else:
             raise ExecutionError('cannot goto (%i, %i)' % (row, col))
 
@@ -201,7 +204,7 @@ class Interpreter(object):
 
     def print_tokens(self):
         for line in self.code:
-            print (', '.join(repr(n) for n in line)).replace("u'", "'")
+            print(', '.join(repr(n) for n in line)).replace("u'", "'")
 
     def print_ast(self, start=0, end=None, highlight=None):
         if end is None:
@@ -226,7 +229,7 @@ class Interpreter(object):
             print '-===[ Stacktrace ]===-'
 
         for row, col, cur in self.history[-num:]:
-            print ('[{}, {}]:'.format(row, col)).ljust(9), repr(cur).replace("u'", '').replace("'", '')
+            print('[{}, {}]:'.format(row, col)).ljust(9), repr(cur).replace("u'", '').replace("'", '')
 
         if self.history:
             print

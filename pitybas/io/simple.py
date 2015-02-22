@@ -12,7 +12,7 @@ class IO:
         pass
 
     def clear(self):
-        print '-'*16
+        print '-' * 16
 
     def input(self, msg, is_str=False):
         while True:
@@ -41,7 +41,8 @@ class IO:
         print msg
 
     def pause(self, msg=''):
-        if msg: self.disp(msg)
+        if msg:
+            self.disp(msg)
         self.input('[press enter]', True)
 
     def menu(self, menu):
@@ -60,7 +61,7 @@ class IO:
             choice = self.input('choice?', True)
             print
             if choice.isdigit() and 0 < int(choice) <= len(lookup):
-                label = lookup[int(choice)-1]
+                label = lookup[int(choice) - 1]
                 return label
             else:
                 print 'invalid choice'

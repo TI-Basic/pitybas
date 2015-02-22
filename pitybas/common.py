@@ -1,16 +1,24 @@
 class Error(Exception):
-       def __init__(self, msg):
-           self.msg = msg
+    def __init__(self, msg):
+        self.msg = msg
 
-       def __str__(self):
-           return self.msg
+    def __str__(self):
+        return self.msg
 
-class StopError(Exception): pass
-class ReturnError(Exception): pass
+class StopError(Exception):
+    pass
 
-class ParseError(Error): pass
-class ExecutionError(Error): pass
-class ExpressionError(Error): pass
+class ReturnError(Exception):
+    pass
+
+class ParseError(Error):
+    pass
+
+class ExecutionError(Error):
+    pass
+
+class ExpressionError(Error):
+    pass
 
 class Pri:
     # evaluation happens in the following order:

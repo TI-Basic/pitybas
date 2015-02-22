@@ -34,7 +34,8 @@ class Parser:
 
     @staticmethod
     def parse_line(vm, line):
-        if not line: return
+        if not line:
+            return
 
         parser = Parser(line)
         parser.TOKENS = parser.VARIABLES + parser.FUNCTIONS
@@ -56,7 +57,8 @@ class Parser:
         self.pos += n
 
     def more(self, pos=None):
-        if pos is None: pos = self.pos
+        if pos is None:
+            pos = self.pos
         return pos < self.length
 
     def post(self):
@@ -81,8 +83,8 @@ class Parser:
                 if new:
                     # implied expressions need to be added to tuples in their entirety, instead of just their last element
                     pops = []
-                    for i in xrange(0, len(new)-1):
-                        e, t = new[i], new[i+1]
+                    for i in xrange(0, len(new) - 1):
+                        e, t = new[i], new[i + 1]
                         if isinstance(e, Expression) and isinstance(t, Tuple):
                             pops.append(i)
                             e.append(t.contents[0].flatten())
@@ -133,9 +135,9 @@ class Parser:
                 continue
             elif char in '([{':
                 if char == '(':
-                    cls =  ParenExpr
+                    cls = ParenExpr
                 elif char == '[':
-                    if self.more(self.pos+1) and self.source[self.pos+1].isalpha():
+                    if self.more(self.pos + 1) and self.source[self.pos + 1].isalpha():
                         result = self.matrix()
                     else:
                         cls = MatrixExpr
@@ -151,7 +153,7 @@ class Parser:
                     stacks = []
                     l = len(self.stack)
                     for i in xrange(l):
-                        stack = self.stack.pop(l-i-1)
+                        stack = self.stack.pop(l - i - 1)
                         if isinstance(stack, Bracketed):
                             if stack.close(char):
                                 for s in stacks:
@@ -201,7 +203,7 @@ class Parser:
             elif '0' <= char <= '9' or char == '.'\
                     or isinstance(self.token(sub=True, inc=False), tokens.Minus) and self.number(test=True):
                 result = tokens.Value(self.number())
-            elif char in u'l∟' and self.more(self.pos+1) and self.source[self.pos+1] in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789':
+            elif char in u'l∟' and self.more(self.pos + 1) and self.source[self.pos + 1] in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789':
                 result = self.list()
             elif char.isalpha():
                 result = self.token()
@@ -274,7 +276,7 @@ class Parser:
                 return self.LOOKUP[token]()
         else:
             if not sub:
-                near = remaining[:8].split('\n',1)[0]
+                near = remaining[:8].split('\n', 1)[0]
                 self.error('no token found at pos %i near "%s"' % (self.pos, repr(near)))
 
     def number(self, dot=True, test=False, inc=True):
@@ -283,7 +285,8 @@ class Parser:
         pos = self.pos
         while self.more(pos):
             char = self.source[pos]
-            if char == '-' and first: pass
+            if char == '-' and first:
+                pass
             elif not char.isdigit():
                 break
 
@@ -303,10 +306,12 @@ class Parser:
 
             pos, self.pos = self.pos, tmp
 
-        if inc and not test: self.pos = pos
+        if inc and not test:
+            self.pos = pos
 
         if is_number(num):
-            if test: return True
+            if test:
+                return True
             try:
                 n = int(num)
             except ValueError:
@@ -314,7 +319,8 @@ class Parser:
 
             return n
         else:
-            if test: return False
+            if test:
+                return False
             lines = self.source[:pos]
             line = lines.count('\n') + 1
             col = max(self.pos - lines.rfind('\n'), 0)

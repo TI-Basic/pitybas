@@ -45,8 +45,8 @@ class Base:
 
                 # negative numbers actually have implied addition
                 if isinstance(token, tokens.Value)\
-                    and is_number(token.value) and int(token.value) < 0:
-                        self.contents.append(tokens.Plus())
+                   and is_number(token.value) and int(token.value) < 0:
+                    self.contents.append(tokens.Plus())
                 else:
                     self.contents.append(tokens.Mult())
 
@@ -69,7 +69,8 @@ class Base:
 
     def fill(self):
         # TODO: instead of this system, perhaps tokens should be able to specify whether they need/want left/right params
-        if not self.contents: return
+        if not self.contents:
+            return
 
         # if we don't have a proper variable:token:variable pairing in the token list,
         # this method will allow tokens to fill in an implied variable to their left or right
@@ -81,7 +82,7 @@ class Base:
                 right = None
 
                 if i > 0:
-                    left = self.contents[i-1]
+                    left = self.contents[i - 1]
                     if not left.can_fill_right:
                         left = None
 
@@ -110,7 +111,8 @@ class Base:
         self.contents = new
 
     def validate(self):
-        if not self.contents: return
+        if not self.contents:
+            return
 
         # figure out how to handle in-place tokens like the symbol for ^3
         # perhaps replace it with a ^3 so we can enforce (value, token, value)
@@ -120,7 +122,8 @@ class Base:
         for i in xrange(len(self.contents)):
             t = self.contents[i]
 
-            if (i % 2 == 0 and not t.can_get) or ( i % 2 == 1 and not t.can_run):
+            if (i % 2 == 0 and not t.can_get) or\
+               (i % 2 == 1 and not t.can_run):
                 raise ExpressionError('bad token order: %s' % self)
 
         # determine whether we have any tokens after a ->
@@ -170,14 +173,14 @@ class Base:
                 if s < i:
                     n += 1
 
-            sub += [i, i+1]
+            sub += [i, i + 1]
             i -= n
 
-            right = expr.pop(i+1)
-            left = expr.pop(i-1)
+            right = expr.pop(i + 1)
+            left = expr.pop(i - 1)
 
-            token = expr[i-1]
-            expr[i-1] = tokens.Value(token.run(vm, left, right))
+            token = expr[i - 1]
+            expr[i - 1] = tokens.Value(token.run(vm, left, right))
 
         return vm.get(expr[0])
 
@@ -203,7 +206,9 @@ class Base:
     def __repr__(self):
         return 'E(%s)' % (' '.join(repr(token) for token in self.contents))
 
-bracket_map = {'(':')', '{':'}', '[':']'}
+bracket_map = {'(': ')',
+               '{': '}',
+               '[': ']'}
 
 class Expression(Base):
     def set(self, vm, value):
@@ -282,4 +287,3 @@ class MatrixExpr(Arguments):
 
     def __repr__(self):
         return 'M[%s]' % (', '.join(repr(expr) for expr in self.contents))
-
